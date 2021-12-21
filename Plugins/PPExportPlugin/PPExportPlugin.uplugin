@@ -1,0 +1,35 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.10",
+	"FriendlyName": "PostProcess Export",
+	"Description": "Vive Studios PostProcess Export Plugin",
+	"Category": "ViveStudios",
+	"CreateBy": "Vive-Studios",
+	"CreateByURL": "https://vivestudios.com",
+	"DocsURL": "",
+	"MarketplaceURL": "https://vivestudios.com",
+	"SupportURL": "https://vivestudios.com",
+	"EnabledByDefault": false,
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "PPExportPlugin",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit",
+			"WhitelistPlatforms": [
+				"Win64"
+			]
+		},
+		{
+		  "Name": "PPImportRuntimePlugin",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault",
+			"WhitelistPlatforms": [
+				"Win64"
+			]
+		}
+	]
+}
