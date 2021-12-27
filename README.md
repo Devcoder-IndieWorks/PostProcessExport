@@ -18,7 +18,7 @@ PostProcess Volume Actor에서 다음과 같은 속성 값만 JSON 데이터로 
 * UE4 Editor에서 PostProcessVolume 익스포트/임포트 메뉴는 UMG를 이용해서 구현 하였다.
 * 메뉴를 실행하게 되면 다음그림과 같이 UE4 Editor에 메뉴가 나타난다.
 
-![](https://github.com/Devcoder-IndieWorks/PostProcessExport/blob/master/Images/PPExportMenu.png)
+![](https://github.com/Devcoder-IndieWorks/PostProcessExport/blob/master/Images/PPVExportMenu.png)
 
 * 레벨에 배치된 PostProcessVolume Actor를 선택해서 **Target PostProcessVolume**에 설정해 주고, **Apply PostProcessVoluem 버튼**으로 적용한다.(**(1)번 참고**)
 * 외부에 저장할 JSON 데이터 파일 이름을 **Json File Name**에 설정한다.(**(2)번 참고**)
