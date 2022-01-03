@@ -56,7 +56,7 @@ Category와 Display Name이 **콤마(,)기호**로 합쳐진 문자열을 통해
 
 ![](https://github.com/Devcoder-IndieWorks/PostProcessExport/blob/master/Images/Function_GetPropertyValueToJsonData.png)
 
-그림에서 **(1)번**. PostProcessVolume Actor에서 PostProcess 설정 항목이 있는 **Settings**에 대한 Reflection 정보가 있는 **FProperty** 데이터를 얻는 구문이다. 여기에서는 Settings 멤버변수 이름을 사용해서 얻기 때문에 UE4에서 제공해 주는 **FindFProperty()** 함수를 사용한다. 
+그림에서 **(1)번**. PostProcessVolume Actor에서 PostProcess 설정 항목이 있는 **Settings**에 대한 Reflection 정보가 있는 **FProperty** 데이터를 얻는다. 여기에서는 Settings 멤버변수 이름을 사용해서 얻기 때문에 UE4에서 제공해 주는 **FindFProperty()** 함수를 사용한다. 
 
 **(2)번**. (1)번에서 얻은 FProperty 데이터에서 속성에 대한 Reflection 정보가 아닌 **실제 데이터 값**이 저장된 메모리 주소에 대한 정보를 얻는다. 실제 데이터 값이 있는 메모리 주소를 얻기 위해서는 **얻고자 하는 타입의 FProperty 데이터**의 **ContainerPtrToValuePtr()** 함수에 실제 데이터 값을 **포함하고 있는 인스턴스의 메모리 주소**를 전달해서 얻을 수 있다. 
 
@@ -68,8 +68,6 @@ Category와 Display Name이 **콤마(,)기호**로 합쳐진 문자열을 통해
 
 **(6)번**. (5)번에 구한 실제 데이터 값이 저장된 메모리 주소에서 **실제 데이터 값을 얻어내는 것**을 보여주고 있다.
 
-
-
 Field 타입에 한정된 타입 캐스팅을 통해 Numeric 타입인지, Enum 타입인지, Boolean 타입인지, Struct 타입인지 판별 할 수 있다.
 
 (7)번. Struct 타입 Property 데이터이면 **__GetStructPropertyValue()** 함수를 통해 실제 데이터 값을 얻어온다.
@@ -77,6 +75,18 @@ Field 타입에 한정된 타입 캐스팅을 통해 Numeric 타입인지, Enum 
 ![](https://github.com/Devcoder-IndieWorks/PostProcessExport/blob/master/Images/Function_GetStructPropertyValue.png)
 
 __GetStructPropertyValue()  함수는 그림에서처럼 전달된 FProperty 데이터의 ContainerPtrToValuePtr() 함수를 통해 데이터 값을 얻는 단순한 구조이다. 
+
+### JSON Data
+
+UE4에서 JSON 데이터를 조작하기 위해서는 FJsonObject와 FJsonValue 타입을 사용한다. 이러한 JSON 관련 타입을 PostProcess Export시에 사용하기 편하도록 하기 위해 FVJsonFieldData를 만든다.
+
+![](https://github.com/Devcoder-IndieWorks/PostProcessExport/blob/master/Images/Class_FVJsonFieldData.png)
+
+PostProcess Export시 속성 타입에 맞는 멤버함수를 통해 JSON Object에 필드 정보를 추가해 주고, **GetContents()** 함수를 통해 텍스트 형태의 JSON 데이터를 얻어 파일로 저장하게 된다.
+
+ ![](https://github.com/Devcoder-IndieWorks/PostProcessExport/blob/master/Images/Function_GetContents.png)
+
+GetContents() 함수는 WriteObject() 함수를 통해 JSON Object에 추가된 필드 정보를 하나의 텍스트 데이터로 변환하여 출력해 준다. JSON Object에서 각 필드에 접근은 **(1)번 WriteObject() 함수를 호출**하면 **(2)번 WriteObject() 함수**에서 **(3)번 EJson::Object** 항목으로 건너띄어 저장된 각 필드 리스트를 순회하며 **(2)번 WriteObject()함수를 재귀호출**하여 각 필드별 타입에 해당되는 항목에서 키와 값을 얻는다.
 
 
 
