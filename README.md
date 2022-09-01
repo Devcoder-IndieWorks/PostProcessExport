@@ -23,6 +23,8 @@ PostProcess Volume Actor에서 다음과 같은 속성 값만 JSON 데이터로 
 * 레벨에 배치된 PostProcessVolume Actor를 선택해서 **Target PostProcessVolume**에 설정해 주고, **Apply PostProcessVoluem 버튼**으로 적용한다.(**(1)번 참고**)
 * 외부에 저장할 JSON 데이터 파일 이름을 **Json File Name**에 설정한다.(**(2)번 참고**)
 * JSON 데이터로 외부에 저장할 PostProcessVolume Actor의 속성을 **Field Name** Combobox에서 지정한다.(**(3)번 참고**)
+  
+  **PostProcessVolume의 Detail 창에서 설정하는 Field Name이 한글로 되어져 있으며, Field 검색에 실패하므로 Unreal Editor 언어 설정을 영어로 변경해야함**
 
 ![](https://github.com/Devcoder-IndieWorks/PostProcessExport/blob/master/Images/FieldName_Combox_UI.png)
 
@@ -32,15 +34,13 @@ PostProcess Volume Actor에서 다음과 같은 속성 값만 JSON 데이터로 
 
 ![](https://github.com/Devcoder-IndieWorks/PostProcessExport/blob/master/Images/ImportPostProcessSettings_BP_API.png)
 
-
-
 ## 구현내용
 
 PostProcessVolume Actor에는 많은 속성들이 존재한다. 이 속성들은 저마다 각각 다른 데이터 타입으로 되어져 있으며, 익스포트 할 속성은 사용자가 선택 할 수 있어야 한다.
 
 그래서 Unreal C++라고 불리우는 Unreal Engine 개발자들이 만든(?) Unreal Engine에서만 사용할 수 있는  C++ 확장 기능 중 **Property Reflection** 기능을 이용하여 속성 이름으로 속성값의 데이터 타입을 구하고, 타입에 맞게 JSON 데이터로 변환 할 수 있는 체계를 구현하였다.  또한 **FJsonObject** 라는 JSON 데이터 처리에 대한 기능을 Unreal Engine에서 제공해 주는데, 이 기능을 사용하기 편리하도록 하기 위해 Wrapping하여 **FVJsonFieldData**라는 클래스를 만들었다.
 
-### UnrealC++ Property Reflection
+### UnrealC++ Property Reflection(Unreal Property System)
 
 속성의 이름으로 PostProcessVolume Actor의 속성값을 찾기 위해 UnrealC++의 Property Reflection 기능을 이용한다.
 
@@ -87,6 +87,3 @@ PostProcess Export시 속성 타입에 맞는 멤버함수를 통해 JSON Object
  ![](https://github.com/Devcoder-IndieWorks/PostProcessExport/blob/master/Images/Function_GetContents.png)
 
 GetContents() 함수는 WriteObject() 함수를 통해 JSON Object에 추가된 필드 정보를 하나의 텍스트 데이터로 변환하여 출력해 준다. JSON Object에서 각 필드에 접근은 **(1)번 WriteObject() 함수를 호출**하면 **(2)번 WriteObject() 함수**에서 **(3)번 EJson::Object** 항목으로 건너띄어 저장된 각 필드 리스트를 순회하며 **(2)번 WriteObject()함수를 재귀호출**하여 각 필드별 타입에 해당되는 항목에서 키와 값을 얻는다.
-
-
-

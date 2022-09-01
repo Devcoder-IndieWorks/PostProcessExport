@@ -4,6 +4,8 @@
 
 namespace VJsonUtils
 {
+    FString RemoveEscapeCharsFromJsonString( const FString& InJsonString );
+
     template<typename TStruct> 
     bool GetJsonStringFromStruct( const TStruct& InFilledStruct, FString& OutJsonString )
     {
@@ -13,15 +15,6 @@ namespace VJsonUtils
             OutJsonString = RemoveEscapeCharsFromJsonString( outString );
 
         return ret;
-    }
-
-    FString RemoveEscapeCharsFromJsonString( const FString& InJsonString )
-    {
-        if ( InJsonString.IsEmpty() )
-            return InJsonString;
-
-        auto str = InJsonString.Replace( LINE_TERMINATOR, TEXT( "" ) );
-        return str.Replace( TEXT( "\t" ), TEXT( "" ) );
     }
 
     template<typename TStruct> 

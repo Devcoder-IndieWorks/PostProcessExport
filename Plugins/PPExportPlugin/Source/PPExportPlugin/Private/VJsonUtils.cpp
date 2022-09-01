@@ -1,12 +1,35 @@
 #include "VJsonUtils.h"
 #include "VJsonFieldData.h"
-#include "VPPPropertyBinder.h"
+//#include "VPPPropertyBinder.h"
+#include "UObject/UnrealTypePrivate.h"
+#include "ObjectEditorUtils.h"
 #include "VLog.h"
 
 namespace VJsonUtils
 {
+    template<typename Type> 
+    typename TEnableIf<TIsDerivedFrom<Type, FField>::IsDerived, Type*>::Type 
+    __FindPropertyByDisplayName( const UStruct* InOwner, FName InDisplayName )
+    {
+        static_assert( sizeof(Type) > 0, "Type must not be an incomplete type." );
+        if ( InDisplayName.IsNone() )
+            return nullptr;
+    
+        TArray<FString> displayNameSplit;
+        InDisplayName.ToString().ParseIntoArray( displayNameSplit, TEXT( "," ) );
+    
+        for ( TFieldIterator<Type> It( InOwner ); It; ++It ) {
+            if ( It->GetDisplayNameText().ToString() == displayNameSplit[1] ) {
+                auto categoryName = FObjectEditorUtils::GetCategoryFName( *It );
+                if ( categoryName.ToString() == displayNameSplit[0] )
+                    return *It;
+            }
+        }
+    
+        return nullptr;
+    }
 
-    // Âü°í: https://penguinofdev.tistory.com/25
+    // ì°¸ê³ : https://penguinofdev.tistory.com/25
     FString __GetEnumToString( int64 InEnumValue, const FString& InEnumType )
     {
         const auto enumPtr = FindObject<UEnum>( ANY_PACKAGE, *InEnumType, true );
@@ -28,13 +51,24 @@ namespace VJsonUtils
         *InProperty->ContainerPtrToValuePtr<Type>( InStructAddress ) = InValue;
     }
 
-    // Âü°í: https://github.com/getnamo/socketio-client-ue4/blob/master/Source/SIOJson/Private/SIOJConvert.cpp
+    //-------------------------------------------------------------------------
+
+    FString RemoveEscapeCharsFromJsonString( const FString& InJsonString )
+    {
+        if ( InJsonString.IsEmpty() )
+            return InJsonString;
+
+        auto str = InJsonString.Replace( LINE_TERMINATOR, TEXT( "" ) );
+        return str.Replace( TEXT( "\t" ), TEXT( "" ) );
+    }
+
+    // ì°¸ê³ : https://github.com/getnamo/socketio-client-ue4/blob/master/Source/SIOJson/Private/SIOJConvert.cpp
     bool GetPropertyValueToJsonData( UObject* InObject, const FName& InPPName, const FName& InDisplayName, FVJsonFieldData* InOutJsonData )
     {
         auto ppProp = FindFProperty<FStructProperty>( InObject->GetClass(), InPPName );
         if ( ensure( ppProp != nullptr && ppProp->Struct != nullptr ) ) {
             auto structAddress = ppProp->ContainerPtrToValuePtr<void>( InObject );
-            auto prop = FVPPPropertyBinder::FindFPropertyByDisplayName<FProperty>( ppProp->Struct, InDisplayName );
+            auto prop = __FindPropertyByDisplayName<FProperty>( ppProp->Struct, InDisplayName );
             if ( ensure( prop != nullptr ) ) {
                 if ( auto numericProp = CastField<FNumericProperty>( prop ) ) {
                     auto dataPtr = numericProp->ContainerPtrToValuePtr<void>( structAddress );
@@ -105,7 +139,7 @@ namespace VJsonUtils
         auto ppProp = FindFProperty<FStructProperty>( InObject->GetClass(), InPPName );
         if ( ensure( ppProp != nullptr && ppProp->Struct != nullptr ) ) {
             auto structAddress = ppProp->ContainerPtrToValuePtr<void>( InObject );
-            auto prop = FVPPPropertyBinder::FindFPropertyByDisplayName<FProperty>( ppProp->Struct, InDisplayName );
+            auto prop = __FindPropertyByDisplayName<FProperty>( ppProp->Struct, InDisplayName );
             if ( ensure( prop != nullptr ) ) {
                 FString overrideFieldName = TEXT( "bOverride_" ) + prop->GetName();
                 auto overrideProp = FindFProperty<FBoolProperty>( ppProp->Struct, *overrideFieldName );
@@ -187,7 +221,7 @@ namespace VJsonUtils
         return FString::Printf( TEXT( "%sSaveGames/%s.txt" ), *FPaths::ProjectSavedDir(), *InFilename );
     }
 
-    // Âü°í: https://ballbot.tistory.com/45
+    // ì°¸ê³ : https://ballbot.tistory.com/45
     bool __StringToJsonObject( const FString& InJsonString, TSharedPtr<FJsonObject>& OutJsonObject )
     {
         auto reader = TJsonReaderFactory<TCHAR>::Create( *InJsonString );
